@@ -1,5 +1,7 @@
 package com.realkarim.apps.xfetcher;
 
+import android.test.mock.MockContext;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -19,7 +21,7 @@ public class BaseFetcherTest {
     public void dataFetching_success(){
         final CountDownLatch signal = new CountDownLatch(1);
 
-        BaseFetcher<String> baseFetcher = new BaseFetcher<String>() {
+        BaseFetcher<String> baseFetcher = new BaseFetcher<String>(new MockContext()) {
             @Override
             protected void onRawResponse(InputStream inputStream) {
                 signal.countDown(); // notify the count down latch
@@ -54,7 +56,7 @@ public class BaseFetcherTest {
     public void dataFetching_fail(){
         final CountDownLatch signal = new CountDownLatch(1);
 
-        BaseFetcher<String> baseFetcher = new BaseFetcher<String>() {
+        BaseFetcher<String> baseFetcher = new BaseFetcher<String>(new MockContext()) {
             @Override
             protected void onRawResponse(InputStream inputStream) {
                 Assert.fail("onRawResponse is fired given a wrong URL!");
