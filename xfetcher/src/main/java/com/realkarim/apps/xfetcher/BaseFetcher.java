@@ -5,11 +5,11 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Loader;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
 
 import java.io.InputStream;
+
+import dagger.DaggerBuilder;
+import dagger.DependenciesProvider;
 
 /**
  * Created by Karim Mostafa on 1/25/17.
@@ -18,18 +18,19 @@ import java.io.InputStream;
 public abstract class BaseFetcher<T> implements LoaderManager.LoaderCallbacks<InputStream> {
 
     Context context;
-    Handler handler = new Handler(Looper.getMainLooper());
 
-    public BaseFetcher(Context context) {
-        this.context = context;
+    DependenciesProvider dependenciesProvider;
+
+    public BaseFetcher() {
+        dependenciesProvider = new DependenciesProvider();
+        DaggerBuilder.buildDagger().inject(dependenciesProvider);
     }
 
-    public void fetchFromURL(String url) {
+    public void fetchFromURL(Context context, String url) {
+        this.context = context;
         Bundle bundle = new Bundle();
         bundle.putString("url", url);
         ((Activity) context).getLoaderManager().initLoader(url.hashCode(), bundle, this).forceLoad();
-
-
     }
 
     protected abstract void onRawResponse(InputStream inputStream);
@@ -45,7 +46,7 @@ public abstract class BaseFetcher<T> implements LoaderManager.LoaderCallbacks<In
 
     @Override
     public void onLoadFinished(Loader<InputStream> loader,final InputStream data) {
-        handler.post(new Runnable() {
+        dependenciesProvider.getHandlerWithMainLooper().post(new Runnable() {
             @Override
             public void run() {
                 onRawResponse(data);    // Fire the callback on the main thread.

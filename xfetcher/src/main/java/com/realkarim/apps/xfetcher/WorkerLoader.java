@@ -1,24 +1,17 @@
 package com.realkarim.apps.xfetcher;
 
-import android.content.Context;
 import android.content.AsyncTaskLoader;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.Context;
 import android.util.Log;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-
-import static android.R.id.input;
-import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
 
 /**
  * Created by Karim Mostafa on 1/26/17.
