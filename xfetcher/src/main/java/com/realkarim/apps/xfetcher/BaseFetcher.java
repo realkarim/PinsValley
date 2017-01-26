@@ -1,6 +1,6 @@
 package com.realkarim.apps.xfetcher;
 
-import android.graphics.Bitmap;
+import java.io.InputStream;
 
 /**
  * Created by Karim Mostafa on 1/25/17.
@@ -12,7 +12,7 @@ public abstract class BaseFetcher<T>{
 
     }
 
-    protected abstract void onRawResponse(Byte[] raw);
+    protected abstract void onRawResponse(InputStream inputStream);
 
     public abstract void onResponse(T response);
 

@@ -3,6 +3,7 @@ package com.realkarim.apps.xfetcher;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.InputStream;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -20,7 +21,7 @@ public class BaseFetcherTest {
 
         BaseFetcher<String> baseFetcher = new BaseFetcher<String>() {
             @Override
-            protected void onRawResponse(Byte[] raw) {
+            protected void onRawResponse(InputStream inputStream) {
                 signal.countDown(); // notify the count down latch
             }
 
@@ -55,7 +56,7 @@ public class BaseFetcherTest {
 
         BaseFetcher<String> baseFetcher = new BaseFetcher<String>() {
             @Override
-            protected void onRawResponse(Byte[] raw) {
+            protected void onRawResponse(InputStream inputStream) {
                 Assert.fail("onRawResponse is fired given a wrong URL!");
             }
 
