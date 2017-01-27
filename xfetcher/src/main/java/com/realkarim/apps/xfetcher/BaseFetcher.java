@@ -15,7 +15,7 @@ import dagger.DependenciesProvider;
  * Created by Karim Mostafa on 1/25/17.
  */
 
-abstract class BaseFetcher<T> implements LoaderManager.LoaderCallbacks<InputStream> {
+abstract class BaseFetcher<T>{
 
     Context context;
 
@@ -30,7 +30,7 @@ abstract class BaseFetcher<T> implements LoaderManager.LoaderCallbacks<InputStre
     public void fetchFromURL(String url) {
         Bundle bundle = new Bundle();
         bundle.putString("url", url);
-        ((Activity) context).getLoaderManager().initLoader(url.hashCode(), bundle, this).forceLoad();
+        ((Activity) context).getLoaderManager().initLoader(url.hashCode(), bundle, loaderCallbacks).forceLoad();
     }
 
     protected abstract void onRawResponse(InputStream inputStream);
@@ -39,23 +39,20 @@ abstract class BaseFetcher<T> implements LoaderManager.LoaderCallbacks<InputStre
 
     public abstract void onError(String error);
 
-    @Override
-    public Loader<InputStream> onCreateLoader(int id, Bundle args) {
-        return new WorkerLoader(context, args.getString("url"));
-    }
+    LoaderManager.LoaderCallbacks<InputStream> loaderCallbacks = new LoaderManager.LoaderCallbacks<InputStream>() {
+        @Override
+        public Loader<InputStream> onCreateLoader(int id, Bundle args) {
+            return new WorkerLoader(context, args.getString("url"));
+        }
 
-    @Override
-    public void onLoadFinished(Loader<InputStream> loader,final InputStream data) {
-        dependenciesProvider.getHandlerWithMainLooper().post(new Runnable() {
-            @Override
-            public void run() {
-                onRawResponse(data);    // Fire the callback on the main thread.
-            }
-        });
-    }
+        @Override
+        public void onLoadFinished(Loader<InputStream> loader, InputStream data) {
+            onRawResponse(data);    // Fire the callback on the main thread
+        }
 
-    @Override
-    public void onLoaderReset(Loader<InputStream> loader) {
+        @Override
+        public void onLoaderReset(Loader<InputStream> loader) {
 
-    }
+        }
+    };
 }
