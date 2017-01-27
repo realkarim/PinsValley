@@ -15,19 +15,19 @@ import dagger.DependenciesProvider;
  * Created by Karim Mostafa on 1/25/17.
  */
 
-public abstract class BaseFetcher<T> implements LoaderManager.LoaderCallbacks<InputStream> {
+abstract class BaseFetcher<T> implements LoaderManager.LoaderCallbacks<InputStream> {
 
     Context context;
 
     DependenciesProvider dependenciesProvider;
 
-    public BaseFetcher() {
+    public BaseFetcher(Context context) {
+        this.context = context;
         dependenciesProvider = new DependenciesProvider();
         DaggerBuilder.buildDagger().inject(dependenciesProvider);
     }
 
-    public void fetchFromURL(Context context, String url) {
-        this.context = context;
+    public void fetchFromURL(String url) {
         Bundle bundle = new Bundle();
         bundle.putString("url", url);
         ((Activity) context).getLoaderManager().initLoader(url.hashCode(), bundle, this).forceLoad();
