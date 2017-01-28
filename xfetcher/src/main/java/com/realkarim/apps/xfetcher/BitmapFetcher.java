@@ -3,6 +3,7 @@ package com.realkarim.apps.xfetcher;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,11 +22,6 @@ public abstract class BitmapFetcher extends BaseFetcher<Bitmap> {
 
     @Override
     protected void onRawResponse(InputStream inputStream) {
-        try {
-            inputStream.reset();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
         if (bitmap != null) {
             onResponse(bitmap);

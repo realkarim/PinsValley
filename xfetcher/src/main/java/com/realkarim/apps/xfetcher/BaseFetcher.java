@@ -29,6 +29,7 @@ abstract class BaseFetcher<T>{
 
     static LinkedHashMap<String, byte[]> cacheContainer = new LinkedHashMap<>();
     int MAX_CACHE_SIZE = 50;
+    static int loaderID = 0;
 
     public BaseFetcher(Context context) {
         this.context = context;
@@ -47,7 +48,8 @@ abstract class BaseFetcher<T>{
         }
         Bundle bundle = new Bundle();
         bundle.putString("url", url);
-        ((Activity) context).getLoaderManager().initLoader(url.hashCode(), bundle, loaderCallbacks).forceLoad();
+
+        ((Activity) context).getLoaderManager().initLoader(url.hashCode()+loaderID++, bundle, loaderCallbacks).forceLoad();
     }
 
     protected abstract void onRawResponse(InputStream inputStream);
