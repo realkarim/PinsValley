@@ -12,6 +12,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,6 +27,8 @@ public class PinsFragment extends Fragment implements PinsContract.View {
 
     Context context;
 
+    PinsPresenter pinsPresenter;
+
     @BindView(R.id.pins_recycler_view)
     RecyclerView pinsRecyclerView;
 
@@ -34,6 +39,7 @@ public class PinsFragment extends Fragment implements PinsContract.View {
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
+        pinsPresenter = new PinsPresenter(context, this);
     }
 
     @Nullable
@@ -51,7 +57,18 @@ public class PinsFragment extends Fragment implements PinsContract.View {
         mAdapter = new PinsRecyclerViewAdapter(context);
         pinsRecyclerView.setAdapter(mAdapter);
 
+        pinsPresenter.updateList();
+
         return view;
     }
 
+    @Override
+    public void receiveListUpdate(ArrayList arrayList) {
+        mAdapter.updateList(arrayList);
+    }
+
+    @Override
+    public void showMessage(String message) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
 }

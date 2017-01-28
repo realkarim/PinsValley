@@ -2,7 +2,6 @@ package com.realkarim.apps.pinsvalley;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,18 +10,31 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.realkarim.apps.pinsvalley.models.Pin;
+import com.realkarim.apps.pinsvalley.models.Urls;
 import com.realkarim.apps.xfetcher.BitmapFetcher;
+
+import java.util.ArrayList;
+
 /**
  * Created by Karim Mostafa on 1/28/17.
  */
 
-public class PinsRecyclerViewAdapter extends RecyclerView.Adapter<PinsRecyclerViewAdapter.ViewHolder>{
+public class PinsRecyclerViewAdapter extends RecyclerView.Adapter<PinsRecyclerViewAdapter.ViewHolder> {
 
-    Context context = null;
+    private Context context = null;
+    private ArrayList<Pin> pins;
+    String TAG = this.getClass().getName();
 
-
-    PinsRecyclerViewAdapter(Context context){
+    PinsRecyclerViewAdapter(Context context) {
         this.context = context;
+        pins = new ArrayList<>();
+    }
+
+    public void updateList(ArrayList<Pin> pins) {
+        this.pins.clear();
+        this.pins = pins;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -36,8 +48,9 @@ public class PinsRecyclerViewAdapter extends RecyclerView.Adapter<PinsRecyclerVi
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        String url = "https://images.unsplash.com/photo-1464550883968-cec281c19761?ixlib=rb-0.3.5\\u0026q=80\\u0026fm=jpg\\u0026crop=entropy\\u0026w=400\\u0026fit=max\\u0026s=d5682032c546a3520465f2965cde1cec";
+        Pin currentPin = pins.get(position);
 
+        String url = currentPin.getUrls().getRegular();
         BitmapFetcher bitmapFetcher = new BitmapFetcher(context) {
             @Override
             public void onResponse(Bitmap response) {
@@ -46,17 +59,24 @@ public class PinsRecyclerViewAdapter extends RecyclerView.Adapter<PinsRecyclerVi
 
             @Override
             public void onError(String error) {
-                Log.e("test", error);
+                Log.e(TAG, "Error fetching image: " + error);
+                holder.image.setImageResource(R.drawable.photo_not_available);
             }
         };
 
         bitmapFetcher.fetchFromURL(url);
 
+        String username = currentPin.getUser().getUsername();
+        Integer likesCount = currentPin.getLikes();
+
+        holder.user.setText("by: " + username);
+        holder.likes.setText(likesCount + " Likes");
+
     }
 
     @Override
     public int getItemCount() {
-        return 10;
+        return pins.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -64,6 +84,7 @@ public class PinsRecyclerViewAdapter extends RecyclerView.Adapter<PinsRecyclerVi
         public ImageView image;
         public TextView user;
         public TextView likes;
+
         public ViewHolder(View v) {
             super(v);
             image = (ImageView) v.findViewById(R.id.image);

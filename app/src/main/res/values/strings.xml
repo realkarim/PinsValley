@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PinsValley</string>
+    <string name="pins_url">http://pastebin.com/raw/wgkJgazE</string>
 </resources>
