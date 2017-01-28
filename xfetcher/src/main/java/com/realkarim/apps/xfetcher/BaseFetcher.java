@@ -26,9 +26,6 @@ abstract class BaseFetcher<T>{
     Context context;
 
 //    DependenciesProvider dependenciesProvider;
-
-    static LinkedHashMap<String, byte[]> cacheContainer = new LinkedHashMap<>();
-    int MAX_CACHE_SIZE = 50;
     static int loaderID = 0;
 
     public BaseFetcher(Context context) {
@@ -39,10 +36,10 @@ abstract class BaseFetcher<T>{
     }
 
     public synchronized void fetchFromURL(String url) {
-        if(cacheContainer.containsKey(url)){
-            byte[] cached = cacheContainer.get(url);
-            removeFromCache(url);
-            cache(url, cached); // update key value priority in the LinkedHashMap
+        if(CacheFactory.cacheContainer.containsKey(url)){
+            byte[] cached = CacheFactory.cacheContainer.get(url);
+            CacheFactory.removeFromCache(url);
+            CacheFactory.cache(url, cached); // update key value priority in the LinkedHashMap
             onRawResponse(new ByteArrayInputStream(cached));
             return;
         }
@@ -58,18 +55,6 @@ abstract class BaseFetcher<T>{
 
     public abstract void onError(String error);
 
-    void cache(String url, byte[] bytes){
-        if(cacheContainer.size() == MAX_CACHE_SIZE){    // check if cache size reached the maximum
-            String key = cacheContainer.keySet().iterator().next(); // get first key inserted
-            removeFromCache(key); // remove it
-        }
-        cacheContainer.put(url, bytes);
-    }
-
-    void removeFromCache(String key){
-        cacheContainer.remove(key);
-    }
-
     LoaderManager.LoaderCallbacks<byte[]> loaderCallbacks = new LoaderManager.LoaderCallbacks<byte[]>() {
         @Override
         public Loader<byte[]> onCreateLoader(int id, Bundle args) {
@@ -79,7 +64,7 @@ abstract class BaseFetcher<T>{
         @Override
         public void onLoadFinished(Loader<byte[]> loader, byte[] data) {
             String url = ((WorkerLoader)loader).getUrl();
-            cache(url, data.clone());
+            CacheFactory.cache(url, data.clone());
 
             onRawResponse(new ByteArrayInputStream(data.clone()));
         }
