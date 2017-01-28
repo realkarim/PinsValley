@@ -24,5 +24,6 @@ public class PinsActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, new PinsFragment())
                 .commit();
+
     }
 }
