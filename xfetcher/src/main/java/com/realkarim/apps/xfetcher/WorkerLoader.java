@@ -4,10 +4,11 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.util.Log;
 
-import java.io.ByteArrayInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -17,7 +18,7 @@ import java.net.URL;
  * Created by Karim Mostafa on 1/26/17.
  */
 
-class WorkerLoader extends AsyncTaskLoader<InputStream> {
+class WorkerLoader extends AsyncTaskLoader<byte[]> {
 
     String logTag = this.getClass().getName();
     String url;
@@ -37,9 +38,10 @@ class WorkerLoader extends AsyncTaskLoader<InputStream> {
     }
 
     @Override
-    public InputStream loadInBackground() {
+    public byte[] loadInBackground() {
         URL url = null;
         HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
         try {
             url = new URL(getUrl());
 
@@ -49,20 +51,10 @@ class WorkerLoader extends AsyncTaskLoader<InputStream> {
 
             // Return the input stream
             InputStream inputStream = urlConnection.getInputStream();
+            if (inputStream == null)
+                return new byte[0];
 
-            // Clone input stream
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = inputStream.read(buffer)) > -1 ) {
-                baos.write(buffer, 0, len);
-            }
-            baos.flush();
-
-            InputStream clonnedInputStream = new ByteArrayInputStream(baos.toByteArray());
-
-
-            return clonnedInputStream;
+            return toByteArray(inputStream);
 
         } catch (MalformedURLException e) {
             Log.e(logTag, "MalformedURLException: " + e.getMessage());
@@ -70,14 +62,39 @@ class WorkerLoader extends AsyncTaskLoader<InputStream> {
             Log.e(logTag, "ProtocolException: " + e.getMessage());
         } catch (IOException e) {
             Log.e(logTag, "IOException: " + e.getMessage());
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (final IOException e) {
+                    Log.e(logTag, "IOException: " + e.getMessage());
+                }
+            }
         }
-        return null;
+        return new byte[0];
     }
 
     @Override
     protected void onStopLoading() {
         super.onStopLoading();
         cancelLoad();
+    }
+
+    public static byte[] toByteArray(InputStream is) throws IOException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        try {
+            byte[] b = new byte[1024];
+            int n = 0;
+            while ((n = is.read(b)) != -1) {
+                output.write(b, 0, n);
+            }
+            return output.toByteArray();
+        } finally {
+            output.close();
+        }
     }
 
 }

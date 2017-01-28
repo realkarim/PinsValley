@@ -1,10 +1,10 @@
 package com.realkarim.apps.xfetcher;
 
 import android.content.Context;
-import android.content.Loader;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -13,7 +13,7 @@ import java.io.InputStream;
 
 public abstract class BitmapFetcher extends BaseFetcher<Bitmap> {
 
-    String TAG = StringFetcher.class.getName();
+//    String TAG = StringFetcher.class.getName();
 
     public BitmapFetcher(Context context) {
         super(context);
@@ -21,10 +21,15 @@ public abstract class BitmapFetcher extends BaseFetcher<Bitmap> {
 
     @Override
     protected void onRawResponse(InputStream inputStream) {
+        try {
+            inputStream.reset();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-        if(bitmap != null)
+        if (bitmap != null) {
             onResponse(bitmap);
-        else
+        } else
             onError("Bitmap is null!");
     }
 
