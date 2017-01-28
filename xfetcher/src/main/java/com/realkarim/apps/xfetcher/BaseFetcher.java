@@ -5,6 +5,7 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Loader;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -36,7 +37,7 @@ abstract class BaseFetcher<T>{
 
     }
 
-    public void fetchFromURL(String url) {
+    public synchronized void fetchFromURL(String url) {
         if(cacheContainer.containsKey(url)){
             byte[] cached = cacheContainer.get(url);
             removeFromCache(url);
