@@ -1,6 +1,8 @@
 package com.realkarim.apps.pinsvalley;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,9 +11,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -49,8 +54,15 @@ public class PinsFragment extends Fragment implements PinsContract.View {
         View view = inflater.inflate(R.layout.fragment_pins, container, false);
         ButterKnife.bind(this, view);
 
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(context);
+        // get screen width to calculate number of columns
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+
+        // use a grid layout manager
+        mLayoutManager = new GridLayoutManager(context, pxToDp(width)/200);
         pinsRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter
@@ -70,5 +82,9 @@ public class PinsFragment extends Fragment implements PinsContract.View {
     @Override
     public void showMessage(String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private int pxToDp(int px) {
+        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 }

@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.realkarim.apps.pinsvalley.models.Pin;
-import com.realkarim.apps.pinsvalley.models.Urls;
 import com.realkarim.apps.xfetcher.BitmapFetcher;
 
 import java.util.ArrayList;
@@ -70,7 +69,7 @@ public class PinsRecyclerViewAdapter extends RecyclerView.Adapter<PinsRecyclerVi
         Integer likesCount = currentPin.getLikes();
 
         holder.user.setText("by: " + username);
-        holder.likes.setText(likesCount + " Likes");
+        holder.likes.setText("" + likesCount);
 
     }
 
@@ -80,7 +79,6 @@ public class PinsRecyclerViewAdapter extends RecyclerView.Adapter<PinsRecyclerVi
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-
         public ImageView image;
         public TextView user;
         public TextView likes;
