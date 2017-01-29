@@ -47,6 +47,7 @@ public class PinsRecyclerViewAdapter extends RecyclerView.Adapter<PinsRecyclerVi
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+        holder.image.setImageResource(R.drawable.loading);
         Pin currentPin = pins.get(position);
 
         String url = currentPin.getUrls().getRegular();
