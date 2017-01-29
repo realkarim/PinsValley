@@ -5,38 +5,39 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Loader;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.os.Handler;
+import android.os.HandlerThread;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 /**
  * Created by Karim Mostafa on 1/25/17.
  */
 
-abstract class BaseFetcher<T>{
+abstract class BaseFetcher<T> {
 
-    Context context;
+    protected Context context;
 
-//    DependenciesProvider dependenciesProvider;
+    private HandlerThread mHandlerThread;
+    protected Handler handler;
+
+    //    DependenciesProvider dependenciesProvider;
     static int loaderID = 0;
 
     public BaseFetcher(Context context) {
         this.context = context;
+
+        mHandlerThread = new HandlerThread("Converter");
+        mHandlerThread.start();
+        handler = new Handler(mHandlerThread.getLooper());
 //        dependenciesProvider = new DependenciesProvider();
 //        DaggerBuilder.buildDagger().inject(dependenciesProvider);
 
     }
 
     public synchronized void fetchFromURL(String url) {
-        if(CacheFactory.isCached(url)){
+        if (CacheFactory.isCached(url)) {
             byte[] cached = CacheFactory.getFromCache(url);
             CacheFactory.removeFromCache(url);
             CacheFactory.cache(url, cached); // update key value priority in the LinkedHashMap
@@ -46,7 +47,7 @@ abstract class BaseFetcher<T>{
         Bundle bundle = new Bundle();
         bundle.putString("url", url);
 
-        ((Activity) context).getLoaderManager().initLoader(url.hashCode()+loaderID++, bundle, loaderCallbacks).forceLoad();
+        ((Activity) context).getLoaderManager().initLoader(url.hashCode() + loaderID++, bundle, loaderCallbacks).forceLoad();
     }
 
     protected abstract void onRawResponse(InputStream inputStream);
@@ -55,7 +56,7 @@ abstract class BaseFetcher<T>{
 
     public abstract void onError(String error);
 
-    LoaderManager.LoaderCallbacks<byte[]> loaderCallbacks = new LoaderManager.LoaderCallbacks<byte[]>() {
+    private LoaderManager.LoaderCallbacks<byte[]> loaderCallbacks = new LoaderManager.LoaderCallbacks<byte[]>() {
         @Override
         public Loader<byte[]> onCreateLoader(int id, Bundle args) {
             return new WorkerLoader(context, args.getString("url"));
@@ -63,7 +64,7 @@ abstract class BaseFetcher<T>{
 
         @Override
         public void onLoadFinished(Loader<byte[]> loader, byte[] data) {
-            String url = ((WorkerLoader)loader).getUrl();
+            String url = ((WorkerLoader) loader).getUrl();
             CacheFactory.cache(url, data.clone());
 
             onRawResponse(new ByteArrayInputStream(data.clone()));
