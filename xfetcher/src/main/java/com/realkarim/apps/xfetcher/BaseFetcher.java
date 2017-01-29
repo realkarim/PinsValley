@@ -36,8 +36,8 @@ abstract class BaseFetcher<T>{
     }
 
     public synchronized void fetchFromURL(String url) {
-        if(CacheFactory.cacheContainer.containsKey(url)){
-            byte[] cached = CacheFactory.cacheContainer.get(url);
+        if(CacheFactory.isCached(url)){
+            byte[] cached = CacheFactory.getFromCache(url);
             CacheFactory.removeFromCache(url);
             CacheFactory.cache(url, cached); // update key value priority in the LinkedHashMap
             onRawResponse(new ByteArrayInputStream(cached));
